@@ -1,0 +1,32 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "translate",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-07-21",
+	"compatibility_flags": ["nodejs_compat", "no_nodejs_compat_v2", "enable_request_signal", "request_signal_passthrough"],
+	"workers_dev": false,
+	"preview_urls": false,
+	"route": { "pattern": "translate.demosjarco.dev", "custom_domain": true },
+	"minify": true,
+	"keep_names": false,
+	"upload_source_maps": true,
+	"cache": { "enabled": true },
+	// Max possible worker limits (5*60*1000 ms CPU time, 10 million subrequests)
+	"limits": { "cpu_ms": 300000, "subrequests": 10000000 },
+	"observability": { "logs": { "enabled": true, "invocation_logs": true, "persist": false }, "traces": { "enabled": true, "persist": false } },
+	"dependencies_instrumentation": { "enabled": false },
+	"ai": {
+		"binding": "AI",
+		"remote": true
+	},
+	"assets": {
+		"directory": "./dist",
+		"run_worker_first": false
+	},
+	"flagship": [
+		{
+			"binding": "FLAGS",
+			"app_id": "de465c4a-8245-4318-a795-2ebf4d933cc6"
+		}
+	]
+}

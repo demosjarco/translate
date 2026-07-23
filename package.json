@@ -28,7 +28,7 @@
 	"dependencies": {
 		"@hono/zod-openapi": "1.5.1",
 		"ai": "6.0.233",
-		"ai-gateway-provider": "3.2.0",
+		"ai-gateway-provider": "4.0.0",
 		"franc-all": "7.2.0",
 		"hono": "4.12.31",
 		"iso-639-3": "3.0.1",

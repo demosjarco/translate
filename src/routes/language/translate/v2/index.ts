@@ -30,7 +30,13 @@ app.openapi(
 							.transform((text) => [text]),
 						z.array(z.string().trim()).nonempty().max(128),
 					])
-					.openapi({ description: 'The input text to translate. Provide an array of strings to translate multiple phrases.' }),
+					.openapi({
+						type: 'array',
+						items: { type: 'string', minLength: 1 },
+						minItems: 1,
+						maxItems: 128,
+						description: 'The input text to translate. Provide an array of strings to translate multiple phrases.',
+					}),
 				target: languageCodeSchema.openapi({ description: 'The language to use for translation of the input text.' }),
 				format: z
 					// .enum(['html', 'text'])

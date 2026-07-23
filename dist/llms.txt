@@ -63,7 +63,7 @@ The language of the source text. If the source language is not specified, the AP
 
 The Workers AI model to translate with. Defaults to the gateway-configured model.
 
-`string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The Workers AI model to translate with. Defaults to the gateway-configured model.
+`string`, possible values: `"@cf/zai-org/glm-5.2", "@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it", "@cf/openai/gpt-oss-120b"`, default: `"@cf/zai-org/glm-4.7-flash"` — The Workers AI model to translate with. Defaults to the gateway-configured model.
 
 #### Responses
 
@@ -83,7 +83,7 @@ The Workers AI model to translate with. Defaults to the gateway-configured model
 
     - **`model` (required)**
 
-      `string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The translation model used for the request.
+      `string`, possible values: `"@cf/zai-org/glm-5.2", "@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it", "@cf/openai/gpt-oss-120b"` — The translation model used for the request.
 
     - **`translatedText` (required)**
 
@@ -235,7 +235,7 @@ The target language code for the results. If specified, then the language names 
 
 The supported languages for a particular translation model.
 
-`string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The supported languages for a particular translation model.
+`string`, possible values: `"@cf/zai-org/glm-5.2", "@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it", "@cf/openai/gpt-oss-120b"`, default: `"@cf/zai-org/glm-4.7-flash"` — The supported languages for a particular translation model.
 
 #### Responses
 
@@ -287,7 +287,7 @@ Contains list of translation results of the supplied text.
 
 * **`model` (required)**
 
-  `string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The translation model used for the request.
+  `string`, possible values: `"@cf/zai-org/glm-5.2", "@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it", "@cf/openai/gpt-oss-120b"` — The translation model used for the request.
 
 * **`translatedText` (required)**
 
@@ -302,7 +302,7 @@ Contains list of translation results of the supplied text.
 ```json
 {
   "detectedSourceLanguage": "en",
-  "model": "@cf/zai-org/glm-4.7-flash",
+  "model": "@cf/zai-org/glm-5.2",
   "translatedText": ""
 }
 ```

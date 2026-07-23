@@ -23,7 +23,7 @@ app.openapi(
 		request: {
 			query: z.object({
 				target: z.string().trim().nonempty().refine(isLocale, 'must be a valid ISO 639-1 or BCP-47 language code').optional().openapi({ description: 'The target language code for the results. If specified, then the language names are returned in the `name` field of the response, localized in the target language. If you do not supply a target language, then the `name` field is omitted from the response and only the language codes are returned.' }),
-				model: z.enum(Models).optional().openapi({ description: 'The supported languages for a particular translation model.' }),
+				model: z.enum(Models).optional().openapi({ description: 'The supported languages for a particular translation model.', default: Models['glm-47-flash'] }),
 			}),
 		},
 		responses: {

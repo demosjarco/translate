@@ -15,6 +15,8 @@ export interface ContextVariables extends TimingVariables {
 }
 
 export enum Models {
+	'glm-52' = '@cf/zai-org/glm-5.2',
 	'glm-47-flash' = '@cf/zai-org/glm-4.7-flash',
 	'gemma-4-26b-a4b-it' = '@cf/google/gemma-4-26b-a4b-it',
+	'gpt-oss-120b' = '@cf/openai/gpt-oss-120b',
 }

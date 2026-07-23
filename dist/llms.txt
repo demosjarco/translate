@@ -1,0 +1,345 @@
+# Translation API
+
+- **OpenAPI Version:** `3.1.0`
+- **API Version:** 
+
+Drop in replacement for Google Cloud Translate API v2 using Workers AI
+
+## Servers
+
+- **URL:** 
+
+## Operations
+
+### POST /language/translate/v2
+
+- **Method:** `POST`
+- **Path:** `/language/translate/v2`
+
+Translates input text, returning translated text.
+
+#### Parameters
+
+##### `q` required
+
+- **In:** `query`
+
+The input text to translate. Provide an array of strings to translate multiple phrases.
+
+**Array of:**
+
+`string`
+
+- Min items: `1`
+- Max items: `128`
+
+##### `target` required
+
+- **In:** `query`
+
+The language to use for translation of the input text.
+
+`string` — The language to use for translation of the input text.
+
+##### `format`
+
+- **In:** `query`
+
+The format of the source text, in either HTML (default) or plain-text. A value of `html` indicates HTML and a value of `text` indicates plain-text
+
+`string`, possible values: `"text"`, default: `"text"` — The format of the source text, in either HTML (default) or plain-text. A value of \`html\` indicates HTML and a value of \`text\` indicates plain-text
+
+##### `source`
+
+- **In:** `query`
+
+The language of the source text. If the source language is not specified, the API will attempt to detect the source language automatically and return it within the response.
+
+`string` — The language of the source text. If the source language is not specified, the API will attempt to detect the source language automatically and return it within the response.
+
+##### `model`
+
+- **In:** `query`
+
+The Workers AI model to translate with. Defaults to the gateway-configured model.
+
+`string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The Workers AI model to translate with. Defaults to the gateway-configured model.
+
+#### Responses
+
+##### Status: 200 Successful translation.
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — The list of language translation responses. This list contains a language translation response for each query (q) sent in the language translation request.
+
+  - **`translations` (required)**
+
+    `array` — Contains list of translation results of the supplied text.
+
+    **Items:**
+
+    - **`model` (required)**
+
+      `string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The translation model used for the request.
+
+    - **`translatedText` (required)**
+
+      `string` — Text translated into the target language.
+
+    - **`detectedSourceLanguage`**
+
+      `string` — The source language of the initial request, detected automatically, if no source language was passed within the initial request. If the source language was passed, auto-detection of the language will not occur and this field will be omitted.
+
+**Example:**
+
+```json
+{
+  "data": {
+    "translations": []
+  }
+}
+```
+
+##### Status: 400 The request was malformed or requested an unsupported feature.
+
+###### Content-Type: application/json
+
+- **`errors` (required)**
+
+  `array`
+
+  **Items:**
+
+  - **`extensions` (required)**
+
+    `object`
+
+    - **`code` (required)**
+
+      `number`
+
+  - **`message` (required)**
+
+    `string`
+
+- **`success` (required)**
+
+  `boolean`, possible values: `false`
+
+**Example:**
+
+```json
+{
+  "success": false,
+  "errors": [
+    {
+      "message": "",
+      "extensions": {
+        "code": 1
+      }
+    }
+  ]
+}
+```
+
+### POST /language/translate/v2/detect
+
+- **Method:** `POST`
+- **Path:** `/language/translate/v2/detect`
+
+Detects the language of text within a request.
+
+#### Parameters
+
+##### `q` required
+
+- **In:** `query`
+
+The input text upon which to perform language detection. Repeat this parameter to perform language detection on multiple text inputs.
+
+**Array of:**
+
+`string`
+
+- Min items: `1`
+
+#### Responses
+
+##### Status: 200 Successful language detection.
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — The list of language detection responses. This list will contain a language detection response for each query (q) sent in the language detection request.
+
+  - **`detections` (required)**
+
+    `array` — Language detection results for each input text piece.
+
+    **Items:**
+
+    **Array of:**
+
+    - **`confidence` (required)**
+
+      `number` — The confidence of the detection result for this language.
+
+    - **`isReliable` (required)**
+
+      `boolean` — Indicates whether the language detection result is reliable.
+
+    - **`language` (required)**
+
+      `string` — The detected language.
+
+**Example:**
+
+```json
+{
+  "data": {
+    "detections": [
+      [
+        {
+          "language": ""
+        }
+      ]
+    ]
+  }
+}
+```
+
+### GET /language/translate/v2/languages
+
+- **Method:** `GET`
+- **Path:** `/language/translate/v2/languages`
+
+Returns a list of supported languages for translation.
+
+#### Parameters
+
+##### `target`
+
+- **In:** `query`
+
+The target language code for the results. If specified, then the language names are returned in the `name` field of the response, localized in the target language. If you do not supply a target language, then the `name` field is omitted from the response and only the language codes are returned.
+
+`string` — The target language code for the results. If specified, then the language names are returned in the \`name\` field of the response, localized in the target language. If you do not supply a target language, then the \`name\` field is omitted from the response and only the language codes are returned.
+
+##### `model`
+
+- **In:** `query`
+
+The supported languages for a particular translation model.
+
+`string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The supported languages for a particular translation model.
+
+#### Responses
+
+##### Status: 200 The supported languages.
+
+###### Content-Type: application/json
+
+- **`data` (required)**
+
+  `object` — A list of supported language responses. This list will contain an entry for each language supported by the Translation API.
+
+  - **`languages` (required)**
+
+    `array` — The set of supported languages.
+
+    **Items:**
+
+    - **`language` (required)**
+
+      `string` — Supported language code, generally consisting of its ISO 639-1 identifier. (E.g. 'en', 'ja'). In certain cases, BCP-47 codes including language + region identifiers are returned (e.g. 'zh-TW' and 'zh-CH')
+
+    - **`name`**
+
+      `string` — Human readable name of the language localized to the target language.
+
+**Example:**
+
+```json
+{
+  "data": {
+    "languages": []
+  }
+}
+```
+
+## Schemas
+
+### TranslateTextResponseList
+
+- **Type:**`array`
+
+Contains list of translation results of the supplied text.
+
+**Example:**
+
+### TranslateTextResponseTranslation
+
+- **Type:**`object`
+
+* **`model` (required)**
+
+  `string`, possible values: `"@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it"` — The translation model used for the request.
+
+* **`translatedText` (required)**
+
+  `string` — Text translated into the target language.
+
+* **`detectedSourceLanguage`**
+
+  `string` — The source language of the initial request, detected automatically, if no source language was passed within the initial request. If the source language was passed, auto-detection of the language will not occur and this field will be omitted.
+
+**Example:**
+
+```json
+{
+  "detectedSourceLanguage": "en",
+  "model": "@cf/zai-org/glm-4.7-flash",
+  "translatedText": ""
+}
+```
+
+### DetectLanguageResponseList
+
+- **Type:**`array`
+
+Language detection results for each input text piece.
+
+**Example:**
+
+### GetSupportedLanguagesResponseList
+
+- **Type:**`array`
+
+The set of supported languages.
+
+**Example:**
+
+### GetSupportedLanguagesResponseLanguage
+
+- **Type:**`object`
+
+* **`language` (required)**
+
+  `string` — Supported language code, generally consisting of its ISO 639-1 identifier. (E.g. 'en', 'ja'). In certain cases, BCP-47 codes including language + region identifiers are returned (e.g. 'zh-TW' and 'zh-CH')
+
+* **`name`**
+
+  `string` — Human readable name of the language localized to the target language.
+
+**Example:**
+
+```json
+{
+  "language": "",
+  "name": ""
+}
+```

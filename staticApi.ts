@@ -1,4 +1,6 @@
+import { createMarkdownFromOpenApi } from '@scalar/openapi-to-markdown';
 import { createWriteStream } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { unstable_startWorker } from 'wrangler';
 
 const openapiVersions = [
@@ -51,6 +53,27 @@ await unstable_startWorker({
 				console.log('Wrote', 'OpenAPI', oV === '' ? '30' : oV, 'to', response.status);
 			}
 		}),
+		(async () => {
+			const url = new URL(['generate', 'openapi31'].join('/'), (await worker.url).origin);
+			console.info(new Date().toISOString(), 'GET', `${url.pathname}${url.search}${url.hash}`);
+
+			await worker.ready;
+
+			await worker
+				.fetch(
+					// @ts-expect-error URL is the same type
+					url,
+				)
+				.then(async (response) => {
+					console.info(new Date().toISOString(), response.status, `${url.pathname}${url.search}${url.hash}`);
+
+					if (response.ok) {
+						await writeFile(['dist', `llms.txt`].join('/'), await createMarkdownFromOpenApi(await response.text()), { encoding: 'utf-8' });
+
+						console.log('Wrote', 'llms.txt', response.status);
+					}
+				});
+		})(),
 	]).finally(() => worker.dispose()),
 );
 

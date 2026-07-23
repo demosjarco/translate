@@ -20,7 +20,12 @@ app.openapi(
 							.transform((text) => [text]),
 						z.array(z.string().trim()).min(1),
 					])
-					.openapi({ description: 'The input text upon which to perform language detection. Repeat this parameter to perform language detection on multiple text inputs.' }),
+					.openapi({
+						type: 'array',
+						items: { type: 'string' },
+						minItems: 1,
+						description: 'The input text upon which to perform language detection. Repeat this parameter to perform language detection on multiple text inputs.',
+					}),
 			}),
 		},
 		responses: {

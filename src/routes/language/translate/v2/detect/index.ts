@@ -26,7 +26,11 @@ app.openapi(
 						minItems: 1,
 						description: 'The input text upon which to perform language detection. Repeat this parameter to perform language detection on multiple text inputs.',
 					}),
-				zdr: z.enum(['true', 'false']).optional().openapi({ description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled (`cf-aig-collect-log: false`) and ZDR enabled (`cf-aig-zdr: true`).' }),
+				zdr: z
+					.enum(['true', 'false'])
+					.transform((value) => value === 'true')
+					.optional()
+					.openapi({ type: 'string', enum: ['true', 'false'], description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled (`cf-aig-collect-log: false`) and ZDR enabled (`cf-aig-zdr: true`).' }),
 			}),
 		},
 		responses: {

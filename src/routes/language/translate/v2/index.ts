@@ -46,7 +46,11 @@ app.openapi(
 					.openapi({ description: 'The format of the source text, in either HTML (default) or plain-text. A value of `html` indicates HTML and a value of `text` indicates plain-text' }),
 				source: languageCodeSchema.optional().openapi({ description: 'The language of the source text. If the source language is not specified, the API will attempt to detect the source language automatically and return it within the response.' }),
 				model: z.enum(Models).optional().openapi({ description: 'The Workers AI model to translate with. Defaults to the gateway-configured model.', default: Models['glm-47-flash'] }),
-				zdr: z.enum(['true', 'false']).optional().openapi({ description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled (`cf-aig-collect-log: false`) and ZDR enabled (`cf-aig-zdr: true`).' }),
+				zdr: z
+					.enum(['true', 'false'])
+					.transform((value) => value === 'true')
+					.optional()
+					.openapi({ type: 'string', enum: ['true', 'false'], description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled (`cf-aig-collect-log: false`) and ZDR enabled (`cf-aig-zdr: true`).' }),
 			}),
 		},
 		responses: {

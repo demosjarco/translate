@@ -19,6 +19,10 @@ app.use('*', timing());
 
 // Variable Setup
 app.use('*', async (c, next) => {
+	// Zero Data Retention: when requested via the `zdr=true` query parameter, disable AI Gateway
+	// log collection and force ZDR-capable upstreams for every gateway call made during this request.
+	const zdr = c.req.query('zdr') === 'true';
+
 	c.set(
 		'modelString',
 		(await wrapTime(
@@ -36,6 +40,7 @@ app.use('*', async (c, next) => {
 				binding: c.env.AI,
 				gateway: 'translate',
 			},
+			...(zdr && { options: { collectLog: false, zdr: true } }),
 		}),
 	);
 	c.set(

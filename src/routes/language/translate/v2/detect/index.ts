@@ -30,7 +30,7 @@ app.openapi(
 					.enum(['true', 'false'])
 					.transform((value) => value === 'true')
 					.optional()
-					.openapi({ type: 'string', enum: ['true', 'false'], description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled (`cf-aig-collect-log: false`) and ZDR enabled (`cf-aig-zdr: true`).' }),
+					.openapi({ description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled (`cf-aig-collect-log: false`) and ZDR enabled (`cf-aig-zdr: true`).' }),
 			}),
 		},
 		responses: {

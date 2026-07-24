@@ -45,9 +45,9 @@ The language to use for translation of the input text.
 
 - **In:** `query`
 
-The format of the source text, in either HTML or plain-text (default). In `html` mode, only text content is translated - tags and attributes (`class`, `id`, etc.) are preserved exactly, and `<script>`/`<style>` contents are left untranslated.
+The format of the source text, in either HTML or plain-text (default). In `html` mode, only text content is translated - tags and attributes (`class`, `id`, etc.) are preserved exactly, `<script>`/`<style>` contents are left untranslated, and elements carrying a `notranslate` class (e.g. `<span class="notranslate">...</span>`) are skipped entirely, matching Google Cloud Translation API v2 behavior.
 
-`string`, possible values: `"html", "text"`, default: `"text"` — The format of the source text, in either HTML or plain-text (default). In \`html\` mode, only text content is translated - tags and attributes (\`class\`, \`id\`, etc.) are preserved exactly, and \`\<script>\`/\`\<style>\` contents are left untranslated.
+`string`, possible values: `"html", "text"`, default: `"text"` — The format of the source text, in either HTML or plain-text (default). In \`html\` mode, only text content is translated - tags and attributes (\`class\`, \`id\`, etc.) are preserved exactly, \`\<script>\`/\`\<style>\` contents are left untranslated, and elements carrying a \`notranslate\` class (e.g. \`\<span class="notranslate">...\<\/span>\`) are skipped entirely, matching Google Cloud Translation API v2 behavior.
 
 ##### `source`
 

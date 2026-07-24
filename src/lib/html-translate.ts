@@ -8,7 +8,10 @@ import { decode } from 'he';
  * DOM, every tag, attribute (`class`, `id`, data-* or otherwise), and untouched byte of the original markup is
  * passed through unchanged - there's no tag allowlist to maintain and nothing for a model to accidentally mangle.
  *
- * Text inside `<script>` and `<style>` is skipped entirely (in both passes) since it's code, not prose.
+ * Text inside `<script>` and `<style>` is skipped entirely (in both passes) since it's code, not prose. So is
+ * text inside any element carrying a `notranslate` class, mirroring the Google Cloud Translation API v2 behavior
+ * this service is a drop-in replacement for - callers rely on wrapping content (e.g. placeholder markup) in
+ * `<span class="notranslate">` to keep it untouched.
  *
  * `HTMLRewriter`'s `Text.text` is the raw source text of the node - character references like `&amp;` or `&#39;`
  * are handed back exactly as written, not decoded. We decode with `he` before handing text off to translation
@@ -16,7 +19,19 @@ import { decode } from 'he';
  * output is then safe to feed straight to `Text.replace(text, { html: false })` on the way back in, which
  * HTML-escapes it for us - decoding without the matching re-escape on read would otherwise double-encode entities
  * already present in the source (`&amp;` -> `&amp;amp;`).
+ *
+ * `HTMLRewriter`'s selectors (including `*`) never match text that isn't inside some element - a bare fragment
+ * like `Hello <b>world</b>` has "Hello " sitting directly under the implicit document root, which no selector
+ * reaches, so it would otherwise vanish from `nodes` entirely rather than merely being left untranslated. Both
+ * functions work around this by wrapping the fragment in a synthetic `WRAPPER_TAG` root before parsing, then
+ * (in `injectHtmlText`) stripping that exact wrapper back off - `HTMLRewriter` always passes through tags nothing
+ * else touches byte-for-byte, so the wrapper's opening/closing tag lengths are all that's needed to undo it.
  */
+
+/** Synthetic root element used to give otherwise-bare top-level text a parent `HTMLRewriter` selectors can reach. */
+const WRAPPER_TAG = 'html-translate-root';
+const WRAPPER_OPEN = `<${WRAPPER_TAG}>`;
+const WRAPPER_CLOSE = `</${WRAPPER_TAG}>`;
 
 /** Registers depth-tracking handlers for `tagName` on `rewriter`, invoking `onDepthChange` whenever the depth changes. */
 function trackDepth(rewriter: HTMLRewriter, tagName: string, onDepthChange: (delta: 1 | -1) => void) {
@@ -30,7 +45,28 @@ function trackDepth(rewriter: HTMLRewriter, tagName: string, onDepthChange: (del
 	});
 }
 
-/** Returns the decoded text of every text node in `html`, in document order, skipping `<script>`/`<style>` content. */
+/** True if `element` carries a `notranslate` class token (matching Google Cloud Translation API v2's `notranslate` convention). */
+function hasNotranslateClass(element: Element): boolean {
+	return (element.getAttribute('class') ?? '').split(/\s+/).includes('notranslate');
+}
+
+/** Registers depth-tracking handlers on `rewriter` for any element with a `notranslate` class, invoking `onDepthChange` whenever the depth changes. */
+function trackNotranslateDepth(rewriter: HTMLRewriter, onDepthChange: (delta: 1 | -1) => void) {
+	return rewriter.on('*', {
+		element(element) {
+			if (!hasNotranslateClass(element)) {
+				return;
+			}
+
+			onDepthChange(1);
+			element.onEndTag(() => {
+				onDepthChange(-1);
+			});
+		},
+	});
+}
+
+/** Returns the decoded text of every text node in `html`, in document order, skipping `<script>`/`<style>`/`notranslate` content. */
 export async function extractHtmlText(html: string): Promise<string[]> {
 	const nodes: string[] = [];
 	let buffer = '';
@@ -39,6 +75,7 @@ export async function extractHtmlText(html: string): Promise<string[]> {
 	let rewriter = new HTMLRewriter();
 	rewriter = trackDepth(rewriter, 'script', (delta) => (skipDepth += delta));
 	rewriter = trackDepth(rewriter, 'style', (delta) => (skipDepth += delta));
+	rewriter = trackNotranslateDepth(rewriter, (delta) => (skipDepth += delta));
 	rewriter = rewriter.on('*', {
 		text(chunk) {
 			if (skipDepth > 0) {
@@ -53,7 +90,7 @@ export async function extractHtmlText(html: string): Promise<string[]> {
 		},
 	});
 
-	await rewriter.transform(new Response(html)).text();
+	await rewriter.transform(new Response(`${WRAPPER_OPEN}${html}${WRAPPER_CLOSE}`)).text();
 
 	return nodes;
 }
@@ -71,6 +108,7 @@ export async function injectHtmlText(html: string, replacements: readonly (strin
 	let rewriter = new HTMLRewriter();
 	rewriter = trackDepth(rewriter, 'script', (delta) => (skipDepth += delta));
 	rewriter = trackDepth(rewriter, 'style', (delta) => (skipDepth += delta));
+	rewriter = trackNotranslateDepth(rewriter, (delta) => (skipDepth += delta));
 	rewriter = rewriter.on('*', {
 		text(chunk) {
 			if (skipDepth > 0) {
@@ -97,5 +135,7 @@ export async function injectHtmlText(html: string, replacements: readonly (strin
 		},
 	});
 
-	return rewriter.transform(new Response(html)).text();
+	const transformed = await rewriter.transform(new Response(`${WRAPPER_OPEN}${html}${WRAPPER_CLOSE}`)).text();
+
+	return transformed.slice(WRAPPER_OPEN.length, transformed.length - WRAPPER_CLOSE.length);
 }

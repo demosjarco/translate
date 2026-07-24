@@ -88,7 +88,7 @@ app.openapi(
 						description: 'The input text to translate. Provide an array of strings to translate multiple phrases.',
 					}),
 				target: languageCodeSchema.openapi({ description: 'The language to use for translation of the input text.' }),
-				format: z.enum(['html', 'text']).default('text').openapi({ description: 'The format of the source text, in either HTML or plain-text (default). In `html` mode, only text content is translated - tags and attributes (`class`, `id`, etc.) are preserved exactly, and `<script>`/`<style>` contents are left untranslated.' }),
+				format: z.enum(['html', 'text']).default('text').openapi({ description: 'The format of the source text, in either HTML or plain-text (default). In `html` mode, only text content is translated - tags and attributes (`class`, `id`, etc.) are preserved exactly, `<script>`/`<style>` contents are left untranslated, and elements carrying a `notranslate` class (e.g. `<span class="notranslate">...</span>`) are skipped entirely, matching Google Cloud Translation API v2 behavior.' }),
 				source: languageCodeSchema.optional().openapi({ description: 'The language of the source text. If the source language is not specified, the API will attempt to detect the source language automatically and return it within the response.' }),
 				model: z.enum(Models).optional().openapi({ description: 'The Workers AI model to translate with. Defaults to the gateway-configured model.', default: Models['glm-47-flash'] }),
 				zdr: z

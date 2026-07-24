@@ -1,6 +1,7 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import validator from 'validator';
 import { detectLanguageCandidates } from '~/lib/detect-language';
+import { resolveModel } from '~/lib/resolve-model';
 import type { ContextVariables, EnvVars } from '~/types';
 
 const app = new OpenAPIHono<{ Bindings: EnvVars; Variables: ContextVariables }>();
@@ -26,6 +27,11 @@ app.openapi(
 						minItems: 1,
 						description: 'The input text upon which to perform language detection. Repeat this parameter to perform language detection on multiple text inputs.',
 					}),
+				zdr: z
+					.enum(['true', 'false'])
+					.transform((value) => value === 'true')
+					.optional()
+					.openapi({ description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled and ZDR enabled.' }),
 			}),
 		},
 		responses: {
@@ -57,10 +63,11 @@ app.openapi(
 	},
 	async (c) => {
 		const input = c.req.valid('query');
+		const model = resolveModel({ zdr: input.zdr });
 
 		const detections = await Promise.all(
 			input.q.map(async (text) => {
-				const candidates = await detectLanguageCandidates(text, c.var.model);
+				const candidates = await detectLanguageCandidates(text, model);
 
 				return candidates.map(({ language, confidence }) => ({ language, confidence, isReliable: false }));
 			}),

@@ -65,6 +65,14 @@ The Workers AI model to translate with. Defaults to the gateway-configured model
 
 `string`, possible values: `"@cf/zai-org/glm-5.2", "@cf/zai-org/glm-4.7-flash", "@cf/google/gemma-4-26b-a4b-it", "@cf/openai/gpt-oss-120b"`, default: `"@cf/zai-org/glm-4.7-flash"` — The Workers AI model to translate with. Defaults to the gateway-configured model.
 
+##### `zdr`
+
+- **In:** `query`
+
+Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled and ZDR enabled.
+
+`string`, possible values: `"true", "false"` — Zero Data Retention (ZDR). When \`true\`, the upstream AI Gateway request is made with log collection disabled and ZDR enabled.
+
 #### Responses
 
 ##### Status: 200 Successful translation.
@@ -165,6 +173,14 @@ The input text upon which to perform language detection. Repeat this parameter t
 `string`
 
 - Min items: `1`
+
+##### `zdr`
+
+- **In:** `query`
+
+Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled and ZDR enabled.
+
+`string`, possible values: `"true", "false"` — Zero Data Retention (ZDR). When \`true\`, the upstream AI Gateway request is made with log collection disabled and ZDR enabled.
 
 #### Responses
 

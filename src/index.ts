@@ -1,15 +1,14 @@
 import { createAiGateway } from 'ai-gateway-provider';
-import { createUnified } from 'ai-gateway-provider/providers/unified';
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { contextStorage } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { etag } from 'hono/etag';
 import { timing, wrapTime } from 'hono/timing';
+import { buildModelList } from '~/lib/resolve-model';
 import { withTiming } from '~/lib/timed-model';
 import apiApp from '~/routes/index';
-import type { ContextVariables, EnvVars } from './types';
-import { Models } from './types';
+import type { ContextVariables, EnvVars, Models } from './types';
 
 const app = new Hono<{ Bindings: EnvVars; Variables: ContextVariables }>();
 // // Variable storage backend setup
@@ -38,17 +37,7 @@ app.use('*', async (c, next) => {
 			},
 		}),
 	);
-	c.set(
-		'model',
-		withTiming(
-			c.var.modelGateway([
-				createUnified({ supportsStructuredOutputs: true })(`workers-ai/${c.var.modelString}`),
-				...Object.values(Models)
-					.filter((model) => model !== c.var.modelString)
-					.map((model) => createUnified({ supportsStructuredOutputs: true })(`workers-ai/${model}`)),
-			]),
-		),
-	);
+	c.set('model', withTiming(c.var.modelGateway(buildModelList(c.var.modelString))));
 
 	await next();
 });

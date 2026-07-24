@@ -1,10 +1,9 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
-import { createUnified } from 'ai-gateway-provider/providers/unified';
 import isLocale from 'validator/es/lib/isLocale';
 import * as z4 from 'zod/v4';
 import { detectLanguage } from '~/lib/detect-language';
 import { generateSingleFieldObject } from '~/lib/repair-single-field-object';
-import { withTiming } from '~/lib/timed-model';
+import { resolveModel } from '~/lib/resolve-model';
 import detect from '~/routes/language/translate/v2/detect/index';
 import languages from '~/routes/language/translate/v2/languages/index';
 import type { ContextVariables, EnvVars } from '~/types';
@@ -46,6 +45,11 @@ app.openapi(
 					.openapi({ description: 'The format of the source text, in either HTML (default) or plain-text. A value of `html` indicates HTML and a value of `text` indicates plain-text' }),
 				source: languageCodeSchema.optional().openapi({ description: 'The language of the source text. If the source language is not specified, the API will attempt to detect the source language automatically and return it within the response.' }),
 				model: z.enum(Models).optional().openapi({ description: 'The Workers AI model to translate with. Defaults to the gateway-configured model.', default: Models['glm-47-flash'] }),
+				zdr: z
+					.enum(['true', 'false'])
+					.transform((value) => value === 'true')
+					.optional()
+					.openapi({ description: 'Zero Data Retention (ZDR). When `true`, the upstream AI Gateway request is made with log collection disabled and ZDR enabled.' }),
 			}),
 		},
 		responses: {
@@ -98,7 +102,7 @@ app.openapi(
 		// 	return c.json({ success: false as const, errors: [{ message: '`format=html` is not yet supported; use `format=text`.', extensions: { code: 400 } }] }, 400);
 		// }
 
-		const model = input.model && input.model !== c.var.modelString ? withTiming(c.var.modelGateway(createUnified({ supportsStructuredOutputs: true })(`workers-ai/${input.model}`))) : c.var.model;
+		const model = resolveModel({ model: input.model, zdr: input.zdr });
 
 		const translations = await Promise.all(
 			input.q.map(async (text) => {

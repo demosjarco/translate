@@ -1,10 +1,9 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
-import { createUnified } from 'ai-gateway-provider/providers/unified';
 import isLocale from 'validator/es/lib/isLocale';
 import * as z4 from 'zod/v4';
 import { detectLanguage } from '~/lib/detect-language';
 import { generateSingleFieldObject } from '~/lib/repair-single-field-object';
-import { withTiming } from '~/lib/timed-model';
+import { resolveModel } from '~/lib/resolve-model';
 import detect from '~/routes/language/translate/v2/detect/index';
 import languages from '~/routes/language/translate/v2/languages/index';
 import type { ContextVariables, EnvVars } from '~/types';
@@ -103,7 +102,7 @@ app.openapi(
 		// 	return c.json({ success: false as const, errors: [{ message: '`format=html` is not yet supported; use `format=text`.', extensions: { code: 400 } }] }, 400);
 		// }
 
-		const model = input.model && input.model !== c.var.modelString ? withTiming(c.var.modelGateway(createUnified({ supportsStructuredOutputs: true })(`workers-ai/${input.model}`))) : c.var.model;
+		const model = resolveModel({ model: input.model, zdr: input.zdr });
 
 		const translations = await Promise.all(
 			input.q.map(async (text) => {

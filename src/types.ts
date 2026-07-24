@@ -11,7 +11,6 @@ interface TypedBindings {}
 export interface ContextVariables extends TimingVariables {
 	modelString: Models;
 	modelGateway: AiGateway;
-	model: ReturnType<AiGateway['chat']>;
 }
 
 export enum Models {

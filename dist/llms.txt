@@ -45,9 +45,9 @@ The language to use for translation of the input text.
 
 - **In:** `query`
 
-The format of the source text, in either HTML (default) or plain-text. A value of `html` indicates HTML and a value of `text` indicates plain-text
+The format of the source text, in either HTML or plain-text (default). In `html` mode, only text content is translated - tags and attributes (`class`, `id`, etc.) are preserved exactly, and `<script>`/`<style>` contents are left untranslated.
 
-`string`, possible values: `"text"`, default: `"text"` — The format of the source text, in either HTML (default) or plain-text. A value of \`html\` indicates HTML and a value of \`text\` indicates plain-text
+`string`, possible values: `"html", "text"`, default: `"text"` — The format of the source text, in either HTML or plain-text (default). In \`html\` mode, only text content is translated - tags and attributes (\`class\`, \`id\`, etc.) are preserved exactly, and \`\<script>\`/\`\<style>\` contents are left untranslated.
 
 ##### `source`
 

@@ -5,8 +5,6 @@ import { contextStorage } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { etag } from 'hono/etag';
 import { timing, wrapTime } from 'hono/timing';
-import { buildModelList } from '~/lib/resolve-model';
-import { withTiming } from '~/lib/timed-model';
 import apiApp from '~/routes/index';
 import type { ContextVariables, EnvVars, Models } from './types';
 
@@ -37,7 +35,6 @@ app.use('*', async (c, next) => {
 			},
 		}),
 	);
-	c.set('model', withTiming(c.var.modelGateway(buildModelList(c.var.modelString))));
 
 	await next();
 });

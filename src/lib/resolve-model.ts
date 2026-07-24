@@ -16,10 +16,16 @@ export function buildModelList(modelString: Models) {
 }
 
 /**
- * Resolves the language model to use for a request: honors a per-request `model` override, and - since Zero
+ * Resolves the language model to use for a single call: honors a per-request `model` override, and - since Zero
  * Data Retention is a gateway-level option baked in at gateway-construction time, not a per-call one - builds
  * a dedicated ZDR-enabled AI Gateway for this request when `zdr` is requested, rather than reusing the shared,
  * non-ZDR gateway set up in the request middleware.
+ *
+ * Always constructs a fresh model instance (cheap - pure object construction, no I/O) rather than sharing one
+ * across calls: `AiGatewayChatLanguageModel` (from `ai-gateway-provider`) mutates shared state on its underlying
+ * provider models while resolving each `doGenerate`/`doStream` call, so two concurrent calls against the *same*
+ * instance race and corrupt each other's request bodies. Callers that fire off concurrent model calls (e.g. via
+ * `Promise.all`) MUST call this once per call, not once and share the result.
  */
 export function resolveModel({ model, zdr }: { model?: Models; zdr?: boolean }) {
 	const c = getContext<{ Bindings: EnvVars; Variables: ContextVariables }>();
@@ -37,10 +43,6 @@ export function resolveModel({ model, zdr }: { model?: Models; zdr?: boolean }) 
 
 	if (model && model !== c.var.modelString) {
 		return withTiming(gateway(createUnified({ supportsStructuredOutputs: true })(`workers-ai/${model}`)));
-	}
-
-	if (!zdr) {
-		return c.var.model;
 	}
 
 	return withTiming(gateway(buildModelList(c.var.modelString)));

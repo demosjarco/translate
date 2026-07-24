@@ -63,11 +63,11 @@ app.openapi(
 	},
 	async (c) => {
 		const input = c.req.valid('query');
-		const model = resolveModel({ zdr: input.zdr });
 
 		const detections = await Promise.all(
 			input.q.map(async (text) => {
-				const candidates = await detectLanguageCandidates(text, model);
+				// Resolved per-item, not hoisted: concurrent calls sharing one model instance corrupt each other's requests (see resolveModel).
+				const candidates = await detectLanguageCandidates(text, resolveModel({ zdr: input.zdr }));
 
 				return candidates.map(({ language, confidence }) => ({ language, confidence, isReliable: false }));
 			}),

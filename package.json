@@ -27,7 +27,7 @@
 	"prettier": "@demosjarco/prettier-config",
 	"dependencies": {
 		"@hono/zod-openapi": "1.6.0",
-		"ai": "7.0.35",
+		"ai": "7.0.65",
 		"ai-gateway-provider": "4.0.0",
 		"franc-all": "7.2.0",
 		"he": "1.2.0",

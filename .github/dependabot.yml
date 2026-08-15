@@ -48,6 +48,11 @@ updates:
       default-days: 1
     versioning-strategy: increase
     open-pull-requests-limit: 999
+    ignore:
+      # Not supported by ts-eslint yet
+      - dependency-name: 'typescript'
+        versions:
+          - '>=7.0.0'
     groups:
       ai:
         patterns:

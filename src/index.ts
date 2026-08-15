@@ -4,6 +4,7 @@ import { bodyLimit } from 'hono/body-limit';
 import { contextStorage } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { etag } from 'hono/etag';
+import { methodNotAllowed } from 'hono/method-not-allowed';
 import { timing, wrapTime } from 'hono/timing';
 import apiApp from '~/routes/index';
 import type { ContextVariables, EnvVars, Models } from './types';
@@ -47,6 +48,7 @@ app.use(
 		maxAge: 300,
 	}),
 );
+app.use('*', methodNotAllowed({ app }));
 
 // Performance
 app.use('*', etag());

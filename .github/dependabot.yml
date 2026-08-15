@@ -48,6 +48,11 @@ updates:
       default-days: 1
     versioning-strategy: increase
     open-pull-requests-limit: 999
+    ignore:
+      # 7.0.x doesn't have the stable native API yet; that's slated for 7.1 (ts-eslint needs it)
+      - dependency-name: 'typescript'
+        versions:
+          - '>=7.0.0, <7.1.0'
     groups:
       ai:
         patterns:

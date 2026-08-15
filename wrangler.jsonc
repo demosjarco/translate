@@ -11,8 +11,7 @@
 	"keep_names": false,
 	"upload_source_maps": true,
 	"cache": { "enabled": true },
-	// Max possible worker limits (5*60*1000 ms CPU time, 10 million subrequests)
-	"limits": { "cpu_ms": 300000, "subrequests": 10000000 },
+	"limits": { "cpu_ms": 50 },
 	"observability": { "logs": { "enabled": true, "invocation_logs": true, "persist": false }, "traces": { "enabled": true, "persist": false } },
 	"dependencies_instrumentation": { "enabled": false },
 	"ai": {

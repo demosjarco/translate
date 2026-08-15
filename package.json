@@ -54,6 +54,6 @@
 		"tsx": "4.23.12",
 		"typescript": "6.0.3",
 		"typescript-eslint": "8.67.0",
-		"wrangler": "4.113.0"
+		"wrangler": "4.123.0"
 	}
 }

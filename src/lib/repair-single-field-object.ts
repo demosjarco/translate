@@ -4,6 +4,31 @@ import { jsonrepair } from 'jsonrepair';
 import type * as z4 from 'zod/v4';
 
 /**
+ * Translation - and the follow-up JSON repair - is a mechanical transformation, not a task that benefits from a
+ * chain of thought. Several Workers AI models reason by default and spend the whole request budget doing it:
+ * `@cf/google/gemma-4-26b-a4b-it` emitted 2101 reasoning tokens (12.5s) and `@cf/zai-org/glm-5.2` 992 (12.3s)
+ * translating a single sentence whose answer is ~30 tokens. Callers give up long before that - `@inlang/cli`
+ * aborts at 20s - so the overrun cancels the request outright rather than merely being slow.
+ *
+ * `enable_thinking` is the chat-template switch the GLM/Qwen-family templates read; `reasoningEffort` is the
+ * OpenAI-shaped equivalent (`reasoning_effort`) for models like `@cf/openai/gpt-oss-120b`. Each family ignores
+ * the other's knob, so both are sent. Note that the AI SDK's own `reasoning: 'none'` call setting is NOT a
+ * substitute: `@ai-sdk/openai-compatible` maps that case to `undefined`, omitting the field entirely, so it is
+ * indistinguishable from sending nothing at all.
+ *
+ * Keyed by `Unified` because `ai-gateway-provider`'s `createUnified()` is `createOpenAICompatible({ name: 'Unified' })`,
+ * and `@ai-sdk/openai-compatible` derives its provider-options key from that name. `chat_template_kwargs` is not
+ * part of its option schema, so it is forwarded to Workers AI verbatim; `reasoningEffort` is mapped onto
+ * `reasoning_effort`. If that package ever renames the provider, these options silently stop applying.
+ */
+const noThinkingProviderOptions = {
+	Unified: {
+		chat_template_kwargs: { enable_thinking: false },
+		reasoningEffort: 'low',
+	},
+};
+
+/**
  * Runs `generateText` with a single-string-field structured output schema (via `Output.object`), repairing
  * the model's response if it fails schema validation.
  *
@@ -20,6 +45,7 @@ export async function generateSingleFieldObject<T extends Record<string, unknown
 			model,
 			abortSignal,
 			maxRetries: 0,
+			providerOptions: noThinkingProviderOptions,
 			system,
 			prompt,
 			output: Output.object({ schema }),
@@ -55,6 +81,7 @@ async function repairText({ text, key, sourceText, model, abortSignal, errorMess
 			model,
 			abortSignal,
 			maxRetries: 0,
+			providerOptions: noThinkingProviderOptions,
 			system: `The following text was supposed to be a single JSON object with exactly one key, "${key}", whose value is a string. It failed to parse with: "${errorMessage}". Return ONLY the corrected JSON object - no commentary, no code fences.`,
 			prompt: text,
 		});

@@ -14,10 +14,11 @@ export interface ContextVariables extends TimingVariables {
 }
 
 export enum Models {
-	'glm-52' = '@cf/zai-org/glm-5.2',
-	'glm-47-flash' = '@cf/zai-org/glm-4.7-flash',
-	'gemma-4-26b-a4b-it' = '@cf/google/gemma-4-26b-a4b-it',
-	'gpt-oss-120b' = '@cf/openai/gpt-oss-120b',
+	'glm-53-flash' = '@cf/zai-org/glm-5.3-flash',
 	'deepseek-v4-flash' = '@cf/deepseek-ai/deepseek-v4-flash-0731',
+	'glm-53' = '@cf/zai-org/glm-5.3',
 	'deepseek-v4-pro' = '@cf/deepseek-ai/deepseek-v4-pro-0813',
+	'gpt-oss-120b' = '@cf/openai/gpt-oss-120b',
+	'gemma-4-26b-a4b-it' = '@cf/google/gemma-4-26b-a4b-it',
+	'glm-47-flash' = '@cf/zai-org/glm-4.7-flash',
 }

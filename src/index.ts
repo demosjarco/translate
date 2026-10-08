@@ -23,7 +23,7 @@ app.use('*', async (c, next) => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			c,
 			'model-flag-fetch',
-			c.env.FLAGS.getStringValue('model', '@cf/zai-org/glm-4.7-flash'),
+			c.env.FLAGS.getStringValue('model', '@cf/zai-org/glm-5.3-flash'),
 		)) as Models,
 	);
 	c.set(

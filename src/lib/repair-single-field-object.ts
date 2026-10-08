@@ -8,7 +8,7 @@ import type * as z4 from 'zod/v4';
  * chain of thought. Several Workers AI models reason by default and spend the whole request budget doing it:
  * `@cf/google/gemma-4-26b-a4b-it` emitted 2101 reasoning tokens (12.5s) and `@cf/zai-org/glm-5.2` 992 (12.3s)
  * translating a single sentence whose answer is ~30 tokens. Callers give up long before that - `@inlang/cli`
- * aborts at 15s - so the overrun cancels the request outright rather than merely being slow.
+ * aborts at 20s - so the overrun cancels the request outright rather than merely being slow.
  *
  * `enable_thinking` is the chat-template switch the GLM/Qwen-family templates read; `reasoningEffort` is the
  * OpenAI-shaped equivalent (`reasoning_effort`) for models like `@cf/openai/gpt-oss-120b`. Each family ignores
